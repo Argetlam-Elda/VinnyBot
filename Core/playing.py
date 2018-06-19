@@ -219,7 +219,7 @@ async def equip_combatant(fighters, index):
         fighters[index]["weapon"]["self"] = "teleports behind"
         fighters[index]["weapon"]["suicide"] = "sepukus"
         fighters[index]["weapon"]["crip"] = 4
-    elif 8500 < luck <= 9300:
+    elif 8500 < luck <= 9200:
         fighters[index]["weapon"]["name"] = "pistol"
         fighters[index]["weapon"]["damage"] = 4
         fighters[index]["weapon"]["hit"] = "fires at"
@@ -227,7 +227,7 @@ async def equip_combatant(fighters, index):
         fighters[index]["weapon"]["self"] = "shoots"
         fighters[index]["weapon"]["suicide"] = "\"headshots\""
         fighters[index]["weapon"]["crip"] = 2
-    elif 9300 < luck <= 9600:
+    elif 9200 < luck <= 9570:
         fighters[index]["weapon"]["name"] = "shotgun"
         fighters[index]["weapon"]["damage"] = 6
         fighters[index]["weapon"]["hit"] = "peppers"
@@ -235,30 +235,38 @@ async def equip_combatant(fighters, index):
         fighters[index]["weapon"]["self"] = "recoil hits"
         fighters[index]["weapon"]["suicide"] = "Kurt Cobains"
         fighters[index]["weapon"]["crip"] = 3
-    elif 9600 < luck <= 9700:
+    elif 9570 < luck <= 9670:
         fighters[index]["weapon"]["name"] = "wok"
-        fighters[index]["weapon"]["damage"] = 9
+        fighters[index]["weapon"]["damage"] = 8
         fighters[index]["weapon"]["hit"] = "clangs"
         fighters[index]["weapon"]["crit"] = "clonks"
         fighters[index]["weapon"]["self"] = "bongs"
         fighters[index]["weapon"]["suicide"] = "bangs"
         fighters[index]["weapon"]["crip"] = 0
-    elif 9700 < luck <= 9900:
+    elif 9670 < luck <= 9880:
         fighters[index]["weapon"]["name"] = "assault rifle"
         fighters[index]["weapon"]["damage"] = 10
         fighters[index]["weapon"]["hit"] = "assaults"
         fighters[index]["weapon"]["crit"] = "full autos"
         fighters[index]["weapon"]["self"] = "fires upon"
         fighters[index]["weapon"]["suicide"] = "ends"
-        fighters[index]["weapon"]["crip"] = 4
-    elif 9900 < luck <= 10000:
+        fighters[index]["weapon"]["crip"] = 5
+    elif 9880 < luck <= 9940:
         fighters[index]["weapon"]["name"] = "sniper rifle"
-        fighters[index]["weapon"]["damage"] = 15
+        fighters[index]["weapon"]["damage"] = 17
         fighters[index]["weapon"]["hit"] = "downranges"
         fighters[index]["weapon"]["crit"] = "headshots"
-        fighters[index]["weapon"]["self"] = "questions"
+        fighters[index]["weapon"]["self"] = "shoots"
         fighters[index]["weapon"]["suicide"] = "headsplodes"
-        fighters[index]["weapon"]["crip"] = 6
+        fighters[index]["weapon"]["crip"] = 7
+    elif 9940 < luck <= 10000:
+        fighters[index]["weapon"]["name"] = "grenade launcher"
+        fighters[index]["weapon"]["damage"] = 15
+        fighters[index]["weapon"]["hit"] = "blasts"
+        fighters[index]["weapon"]["crit"] = "explodes"
+        fighters[index]["weapon"]["self"] = "concusses"
+        fighters[index]["weapon"]["suicide"] = "suicide bombs"
+        fighters[index]["weapon"]["crip"] = 12
     # Reroll for armor
     luck = randint(0, 10000)
     if 0 <= luck <= 5000:
@@ -278,18 +286,18 @@ async def equip_combatant(fighters, index):
         fighters[index]["armor"]["name"] = "police vest"
         fighters[index]["armor"]["resist"] = 3
         fighters[index]["armor"]["save"] = 3
-    elif 9300 < luck <= 9700:
+    elif 9300 < luck <= 9720:
         fighters[index]["armor"]["name"] = "kevlar"
         fighters[index]["armor"]["resist"] = 4
         fighters[index]["armor"]["save"] = 4
-    elif 9700 < luck <= 9900:
+    elif 9720 < luck <= 9910:
         fighters[index]["armor"]["name"] = "SWAT gear"
         fighters[index]["armor"]["resist"] = 6
         fighters[index]["armor"]["save"] = 5
-    elif 9900 < luck <= 10000:
+    elif 9910 < luck <= 10000:
         fighters[index]["armor"]["name"] = "wok"
         fighters[index]["armor"]["resist"] = 8
-        fighters[index]["armor"]["save"] = 10
+        fighters[index]["armor"]["save"] = 8
     return fighters
 
 
@@ -357,6 +365,7 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
     # Critical fail, hit self
     if roll is 1:
         target = attacker
+        damage += fighters[defender]["armor"]["resist"] - fighters[attacker]["armor"]["resist"]
     elif roll is 20:
         damage += 10
     else:
@@ -408,6 +417,24 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
         if defender is None:
             if fighters[target]["hp"] < 1:
                 battle_report += "\tTest"
+    # Attacker Loots Defender
+    if fighters[defender]["hp"] < 1 and randint(1,15) < fighters[defender]["weapon"]["damage"] - fighters[attacker]["weapon"]["damage"]:
+        weaponloot = True
+        fighters[attacker]["weapon"]["name"] = fighters[defender]["weapon"]["name"]
+        fighters[attacker]["weapon"]["damage"] = fighters[defender]["weapon"]["damage"]
+        fighters[attacker]["weapon"]["hit"] = fighters[defender]["weapon"]["hit"]
+        fighters[attacker]["weapon"]["crit"] = fighters[defender]["weapon"]["crit"]
+        fighters[attacker]["weapon"]["self"] = fighters[defender]["weapon"]["self"]
+        fighters[attacker]["weapon"]["suicide"] = fighters[defender]["weapon"]["suicide"]
+        fighters[attacker]["weapon"]["crip"] = fighters[defender]["weapon"]["crip"]
+    elif fighters[defender]["hp"] < 1 and randint(1,10) < fighters[defender]["armor"]["resist"] - fighters[attacker]["armor"]["resist"]:
+        armorloot = True
+        fighters[attacker]["armor"]["name"] = fighters[defender]["armor"]["name"]
+        fighters[attacker]["armor"]["resist"] = fighters[defender]["armor"]["resist"]
+        fighters[attacker]["armor"]["save"] = fighters[defender]["armor"]["save"]
+    else:
+        weaponloot = False
+        armorloot = False
     if fighters[target]["hp"] < 1:
         if target is attacker:
             if len(fighters) is 1:
@@ -416,10 +443,26 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
             else:
                 battle_report += "{} kills themself out of shame.".format(fighters[attacker]["name"])
         elif critical:
-            battle_report += "{} fucking murders {} with their {}!".format(fighters[attacker]["name"], fighters[defender]["name"], fighters[attacker]["weapon"]["name"])
+            battle_report += "{} fucking murders {} with their {}".format(fighters[attacker]["name"], fighters[defender]["name"], fighters[attacker]["weapon"]["name"])
+            if weaponloot is True and armorloot is True:
+                battle_report += ", and loots their {} and {}!".format(fighters[defender]["weapon"]["name"], fighters[defender]["armor"]["name"])
+            elif weaponloot is True and armorloot is False:
+                battle_report += ", and loots their {}!".format(fighters[defender]["weapon"]["name"])
+            elif weaponloot is False and armorloot is True:
+                battle_report += ", and loots their {}!".format(fighters[defender]["armor"]["name"])
+            else:
+                battle_report += "!"
         else:
-            battle_report += "{} kills {} with their {}!".format(fighters[attacker]["name"], fighters[defender]["name"], fighters[attacker]["weapon"]["name"])
-        # Remove the dead candidate form the roster
+            battle_report += "{} kills {} with their {}".format(fighters[attacker]["name"], fighters[defender]["name"], fighters[attacker]["weapon"]["name"])
+            if weaponloot is True and armorloot is True:
+                battle_report += ", and loots their {} and {}!".format(fighters[defender]["weapon"]["name"], fighters[defender]["armor"]["name"])
+            elif weaponloot is True and armorloot is False:
+                battle_report += ", and loots their {}!".format(fighters[defender]["weapon"]["name"])
+            elif weaponloot is False and armorloot is True:
+                battle_report += ", and loots their {}!".format(fighters[defender]["armor"]["name"])
+            else:
+                battle_report += "!"
+        # Remove the dead candidate from the roster
         fighters.pop(target, None)
     else:
         # Defender will attempt revenge
