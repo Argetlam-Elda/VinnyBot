@@ -421,7 +421,7 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
     weaponloot = False
     armorloot = False
     wepn_name = fighters[attacker]["weapon"]["name"]
-    if fighters[defender]["hp"] < 1 and randint(1,15) < fighters[defender]["weapon"]["damage"] - fighters[attacker]["weapon"]["damage"]:
+    if fighters[defender]["hp"] < 1 and randint(1,15) <= fighters[defender]["weapon"]["damage"] - fighters[attacker]["weapon"]["damage"]:
         weaponloot = True
         fighters[attacker]["weapon"]["name"] = fighters[defender]["weapon"]["name"]
         fighters[attacker]["weapon"]["damage"] = fighters[defender]["weapon"]["damage"]
@@ -430,7 +430,7 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
         fighters[attacker]["weapon"]["self"] = fighters[defender]["weapon"]["self"]
         fighters[attacker]["weapon"]["suicide"] = fighters[defender]["weapon"]["suicide"]
         fighters[attacker]["weapon"]["crip"] = fighters[defender]["weapon"]["crip"]
-    elif fighters[defender]["hp"] < 1 and randint(1,10) < fighters[defender]["armor"]["resist"] - fighters[attacker]["armor"]["resist"]:
+    elif fighters[defender]["hp"] < 1 and randint(1,10) <= fighters[defender]["armor"]["resist"] - fighters[attacker]["armor"]["resist"]:
         armorloot = True
         fighters[attacker]["armor"]["name"] = fighters[defender]["armor"]["name"]
         fighters[attacker]["armor"]["resist"] = fighters[defender]["armor"]["resist"]
