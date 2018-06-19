@@ -418,6 +418,8 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
             if fighters[target]["hp"] < 1:
                 battle_report += "\tTest"
     # Attacker Loots Defender
+    weaponloot = False
+    armorloot = False
     if fighters[defender]["hp"] < 1 and randint(1,15) < fighters[defender]["weapon"]["damage"] - fighters[attacker]["weapon"]["damage"]:
         weaponloot = True
         fighters[attacker]["weapon"]["name"] = fighters[defender]["weapon"]["name"]
@@ -432,9 +434,6 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
         fighters[attacker]["armor"]["name"] = fighters[defender]["armor"]["name"]
         fighters[attacker]["armor"]["resist"] = fighters[defender]["armor"]["resist"]
         fighters[attacker]["armor"]["save"] = fighters[defender]["armor"]["save"]
-    else:
-        weaponloot = False
-        armorloot = False
     if fighters[target]["hp"] < 1:
         if target is attacker:
             if len(fighters) is 1:
