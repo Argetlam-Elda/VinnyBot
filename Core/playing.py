@@ -420,10 +420,9 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
     # Attacker Loots Defender
     weaponloot = False
     armorloot = False
-    wepn_name = ""
+    wepn_name = fighters[attacker]["weapon"]["name"]
     if fighters[defender]["hp"] < 1 and randint(1,15) < fighters[defender]["weapon"]["damage"] - fighters[attacker]["weapon"]["damage"]:
         weaponloot = True
-        wepn_name = fighters[attacker]["weapon"]["name"]
         fighters[attacker]["weapon"]["name"] = fighters[defender]["weapon"]["name"]
         fighters[attacker]["weapon"]["damage"] = fighters[defender]["weapon"]["damage"]
         fighters[attacker]["weapon"]["hit"] = fighters[defender]["weapon"]["hit"]
