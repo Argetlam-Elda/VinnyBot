@@ -420,8 +420,10 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
     # Attacker Loots Defender
     weaponloot = False
     armorloot = False
+    wepn_name = ""
     if fighters[defender]["hp"] < 1 and randint(1,15) < fighters[defender]["weapon"]["damage"] - fighters[attacker]["weapon"]["damage"]:
         weaponloot = True
+        wepn_name = fighters[attacker]["weapon"]["name"]
         fighters[attacker]["weapon"]["name"] = fighters[defender]["weapon"]["name"]
         fighters[attacker]["weapon"]["damage"] = fighters[defender]["weapon"]["damage"]
         fighters[attacker]["weapon"]["hit"] = fighters[defender]["weapon"]["hit"]
@@ -442,7 +444,7 @@ async def enact_attack(fighters, attacker, defender, name_len, verbose):
             else:
                 battle_report += "{} kills themself out of shame.".format(fighters[attacker]["name"])
         elif critical:
-            battle_report += "{} fucking murders {} with their {}".format(fighters[attacker]["name"], fighters[defender]["name"], fighters[attacker]["weapon"]["name"])
+            battle_report += "{} fucking murders {} with their {}".format(fighters[attacker]["name"], fighters[defender]["name"], wepn_name)
             if weaponloot is True and armorloot is True:
                 battle_report += ", and loots their {} and {}!".format(fighters[defender]["weapon"]["name"], fighters[defender]["armor"]["name"])
             elif weaponloot is True and armorloot is False:
